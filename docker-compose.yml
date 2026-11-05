@@ -1,0 +1,118 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: incienso_shop_postgres
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-incienso_shop}
+      - POSTGRES_USER=${POSTGRES_USER:-debug}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-debug}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-debug} -d ${POSTGRES_DB:-incienso_shop}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: incienso_shop_redis
+    restart: unless-stopped
+    env_file: ".env"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: incienso_shop_web:latest
+    container_name: incienso_shop_web
+    restart: unless-stopped
+    env_file: ".env"
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-baGI34uLf3wx7do9vTnTqbg9NY2s4VFKUzAb53xgGexC2Bpxcx9W2Q0rKjFIc8dQ}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,0.0.0.0}
+      - DJANGO_ADMIN_URL=admin/
+      - DJANGO_SECURE_SSL_REDIRECT=False
+      - DATABASE_URL=postgres://${POSTGRES_USER:-debug}:${POSTGRES_PASSWORD:-debug}@postgres:5432/${POSTGRES_DB:-incienso_shop}
+      - REDIS_URL=redis://redis:6379/0
+      - WEB_CONCURRENCY=2
+    volumes:
+      - /srv/media/incienso-shop:/app/incienso_shop/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    image: incienso_shop_celery:latest
+    container_name: incienso_shop_celery_worker
+    restart: unless-stopped
+    command: /start-worker.sh
+    env_file: ".env"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-baGI34uLf3wx7do9vTnTqbg9NY2s4VFKUzAb53xgGexC2Bpxcx9W2Q0rKjFIc8dQ}
+      - DJANGO_ADMIN_URL=admin/
+      - DATABASE_URL=postgres://${POSTGRES_USER:-debug}:${POSTGRES_PASSWORD:-debug}@postgres:5432/${POSTGRES_DB:-incienso_shop}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_WORKER_CONCURRENCY=2
+      - CELERY_LOGLEVEL=INFO
+    volumes:
+      - /srv/media/incienso-shop:/app/incienso_shop/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_started
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    image: incienso_shop_celery:latest
+    container_name: incienso_shop_celery_beat
+    restart: unless-stopped
+    command: /start-beat.sh
+    env_file: ".env"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-baGI34uLf3wx7do9vTnTqbg9NY2s4VFKUzAb53xgGexC2Bpxcx9W2Q0rKjFIc8dQ}
+      - DJANGO_ADMIN_URL=admin/
+      - DATABASE_URL=postgres://${POSTGRES_USER:-debug}:${POSTGRES_PASSWORD:-debug}@postgres:5432/${POSTGRES_DB:-incienso_shop}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_LOGLEVEL=INFO
+    volumes:
+      - /srv/media/incienso-shop:/app/incienso_shop/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  redis_data:
