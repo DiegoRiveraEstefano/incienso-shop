@@ -1,0 +1,105 @@
+{% extends "core/crud_detail.html" %}
+
+{% load i18n %}
+
+{% block detail_body %}
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3">
+          <h3 class="h6 mb-0 fw-bold">{% translate "Metadatos del Evento" %}</h3>
+        </div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-sm-4 text-body-secondary">{% translate "Fecha y Hora" %}</dt>
+            <dd class="col-sm-8">{{ object.timestamp|date:"Y-m-d H:i:s" }}</dd>
+
+            <dt class="col-sm-4 text-body-secondary">{% translate "Acción" %}</dt>
+            <dd class="col-sm-8">
+              {% if object.action == 0 %}
+                <span class="badge text-bg-success">CREACIÓN</span>
+              {% elif object.action == 1 %}
+                <span class="badge text-bg-info">MODIFICACIÓN</span>
+              {% elif object.action == 2 %}
+                <span class="badge text-bg-danger">ELIMINACIÓN</span>
+              {% else %}
+                <span class="badge text-bg-secondary">{{ object.get_action_display|upper }}</span>
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-4 text-body-secondary">{% translate "Actor / Usuario" %}</dt>
+            <dd class="col-sm-8">
+              {% if object.actor %}
+                <strong>{{ object.actor }}</strong>
+                {% if object.actor_email %}<span class="text-body-secondary">({{ object.actor_email }})</span>{% endif %}
+              {% else %}
+                <span class="text-body-secondary">{% translate "Sistema / Anónimo" %}</span>
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-4 text-body-secondary">{% translate "Dirección IP" %}</dt>
+            <dd class="col-sm-8">{{ object.remote_addr|default:"—" }}</dd>
+
+            <dt class="col-sm-4 text-body-secondary">{% translate "Modelo Afectado" %}</dt>
+            <dd class="col-sm-8"><code>{{ object.content_type }}</code></dd>
+
+            <dt class="col-sm-4 text-body-secondary">{% translate "ID de Objeto" %}</dt>
+            <dd class="col-sm-8">{{ object.object_pk }}</dd>
+
+            <dt class="col-sm-4 text-body-secondary mb-0">{% translate "Representación" %}</dt>
+            <dd class="col-sm-8 mb-0">{{ object.object_repr }}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3">
+          <h3 class="h6 mb-0 fw-bold">{% translate "Detalle de Cambios (Diff)" %}</h3>
+        </div>
+        <div class="card-body">
+          {% with diff=object.changes_display_dict %}
+            {% if diff %}
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col">{% translate "Campo" %}</th>
+                      <th scope="col">{% translate "Valor Anterior" %}</th>
+                      <th scope="col">{% translate "Valor Nuevo" %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field_name, values in diff.items %}
+                      <tr>
+                        <td class="fw-semibold text-nowrap">{{ field_name }}</td>
+                        <td class="text-danger">
+                          <del>{{ values.0|default:"(vacío)" }}</del>
+                        </td>
+                        <td class="text-success fw-semibold">
+                          {{ values.1|default:"(vacío)" }}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-body-secondary mb-0">
+                {% translate "Sin cambios detallados registrados para esta acción." %}
+              </p>
+            {% endif %}
+          {% endwith %}
+
+          {% if object.additional_data %}
+            <div class="mt-4 pt-3 border-top">
+              <h4 class="h6 fw-bold">{% translate "Datos Adicionales" %}</h4>
+              <pre class="bg-light p-2 rounded small mb-0"><code>{{ object.additional_data }}</code></pre>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock detail_body %}

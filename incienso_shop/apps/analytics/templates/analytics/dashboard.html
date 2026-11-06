@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Analítica & Business Intelligence" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">
+        <i class="bi bi-graph-up-arrow text-primary me-2"></i>{% translate "Inteligencia de Negocio & Analíticas" %}
+      </h1>
+      <p class="text-muted mb-0">{% translate "Métricas consolidadas de ventas, inventario, clientes y logística." %}</p>
+    </div>
+    <div class="badge bg-primary fs-6 px-3 py-2">
+      <i class="bi bi-calendar-check me-1"></i>{% translate "En Tiempo Real" %}
+    </div>
+  </div>
+
+  <!-- Fila 1 de KPIs -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 border-start border-success border-4">
+        <div class="card-body">
+          <span class="text-muted small fw-semibold text-uppercase">{% translate "Ventas Totales" %}</span>
+          <h2 class="h3 fw-bold mt-1 mb-0 text-success">${{ kpis.total_revenue|intcomma }}</h2>
+          <small class="text-muted">{{ kpis.total_orders }} {% translate "pedidos registrados" %}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 border-start border-primary border-4">
+        <div class="card-body">
+          <span class="text-muted small fw-semibold text-uppercase">{% translate "Ticket Promedio (AOV)" %}</span>
+          <h2 class="h3 fw-bold mt-1 mb-0 text-primary">${{ kpis.average_order_value|floatformat:2|intcomma }}</h2>
+          <small class="text-muted">{% translate "Por compra efectuada" %}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 border-start border-warning border-4">
+        <div class="card-body">
+          <span class="text-muted small fw-semibold text-uppercase">{% translate "Valoración Inventario" %}</span>
+          <h2 class="h3 fw-bold mt-1 mb-0 text-dark">${{ kpis.inventory_valuation|intcomma }}</h2>
+          <small class="text-muted">{{ kpis.inventory_units }} {% translate "unidades en lotes" %}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 border-start border-info border-4">
+        <div class="card-body">
+          <span class="text-muted small fw-semibold text-uppercase">{% translate "Efectividad Logística" %}</span>
+          <h2 class="h3 fw-bold mt-1 mb-0 text-info">{{ kpis.delivery_rate_pct }}%</h2>
+          <small class="text-muted">{% translate "Tasa de entregas completadas" %}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Top Productos Vendidos -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <h5 class="card-title fw-bold mb-0">{% translate "Top Productos Más Vendidos" %}</h5>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>{% translate "Incienso / Producto" %}</th>
+                <th>{% translate "SKU" %}</th>
+                <th>{% translate "Unidades Vendidas" %}</th>
+                <th class="text-end">{% translate "Facturación Generada" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in top_products %}
+                <tr>
+                  <td class="fw-bold">{{ p.product__name }}</td>
+                  <td class="font-monospace text-muted">{{ p.product__sku }}</td>
+                  <td><span class="badge bg-primary rounded-pill">{{ p.units_sold }} un.</span></td>
+                  <td class="text-end fw-bold text-success">${{ p.revenue|intcomma }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center py-4 text-muted">{% translate "Sin registros de ventas aún." %}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fidelización y Clientes -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="card-title fw-bold mb-0">{% translate "Comunidad & Fidelización" %}</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">{% translate "Clientes Registrados:" %}</span>
+            <span class="fw-bold">{{ kpis.total_customers }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">{% translate "Puntos Acumulados Activos:" %}</span>
+            <span class="badge bg-warning text-dark fs-6">{{ kpis.total_loyalty_points }} pts</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-muted">{% translate "Entregas Exitosas:" %}</span>
+            <span class="badge bg-success">{{ kpis.completed_orders }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
