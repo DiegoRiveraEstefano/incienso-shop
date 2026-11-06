@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Lotes de Producto" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{% translate "Lotes de Producto (FIFO)" %}</h1>
+      <p class="text-muted mb-0">{% translate "Listado completo de lotes con orden de rotación y fecha de vencimiento." %}</p>
+    </div>
+    <a href="{% url 'inventory:dashboard' %}" class="btn btn-outline-secondary" up-follow>
+      <i class="bi bi-arrow-left me-1"></i>{% translate "Volver al Dashboard" %}
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% translate "Código Lote" %}</th>
+            <th>{% translate "Producto" %}</th>
+            <th>{% translate "Proveedor" %}</th>
+            <th>{% translate "Disponible / Inicial" %}</th>
+            <th>{% translate "Coste Un." %}</th>
+            <th>{% translate "Fecha Ingreso" %}</th>
+            <th>{% translate "Caducidad" %}</th>
+            <th>{% translate "Estado" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in batches %}
+            <tr>
+              <td class="font-monospace fw-bold">{{ b.batch_code }}</td>
+              <td>{{ b.product.name }}</td>
+              <td>{{ b.supplier.name|default:"-" }}</td>
+              <td>{{ b.available_quantity }} / {{ b.initial_quantity }}</td>
+              <td>${{ b.unit_cost }}</td>
+              <td>{{ b.received_date|date:"Y-m-d" }}</td>
+              <td>{{ b.expiry_date|date:"Y-m-d"|default:"-" }}</td>
+              <td>
+                <span class="badge bg-{% if b.available_quantity > 0 %}success{% else %}secondary{% endif %}">
+                  {% if b.available_quantity > 0 %}{% translate "Disponible" %}{% else %}{% translate "Agotado" %}{% endif %}
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="8" class="text-center py-4 text-muted">{% translate "No hay lotes disponibles." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

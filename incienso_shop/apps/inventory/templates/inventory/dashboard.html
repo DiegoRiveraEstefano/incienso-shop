@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Inventario & Gestión de Lotes (FIFO)" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">
+        <i class="bi bi-boxes text-primary me-2"></i>{% translate "Gestión de Inventario por Lotes (FIFO)" %}
+      </h1>
+      <p class="text-muted mb-0">{% translate "Control estricto de existencias, costes de adquisición y trazabilidad de lotes." %}</p>
+    </div>
+    <div class="btn-group">
+      <a href="{% url 'inventory:batch_list' %}" class="btn btn-outline-primary" up-follow>
+        <i class="bi bi-list-nested me-1"></i>{% translate "Ver Lotes" %}
+      </a>
+      <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-outline-secondary" up-follow>
+        <i class="bi bi-truck me-1"></i>{% translate "Proveedores" %}
+      </a>
+      <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-outline-success" up-follow>
+        <i class="bi bi-cart-plus me-1"></i>{% translate "Órdenes de Compra" %}
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 border-start border-primary border-4">
+        <div class="card-body">
+          <span class="text-muted small fw-semibold text-uppercase">{% translate "Valoración FIFO Total" %}</span>
+          <h2 class="h3 fw-bold mt-1 mb-0">${{ valuation.total_valuation|intcomma }}</h2>
+          <small class="text-muted">{{ valuation.total_units }} {% translate "unidades valoradas" %}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 border-start border-success border-4">
+        <div class="card-body">
+          <span class="text-muted small fw-semibold text-uppercase">{% translate "Lotes Activos" %}</span>
+          <h2 class="h3 fw-bold mt-1 mb-0">{{ valuation.active_batches_count }}</h2>
+          <small class="text-muted">{% translate "Con disponibilidad para despacho FIFO" %}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 border-start border-danger border-4">
+        <div class="card-body">
+          <span class="text-muted small fw-semibold text-uppercase">{% translate "Alertas de Bajo Stock" %}</span>
+          <h2 class="h3 fw-bold mt-1 mb-0 text-danger">{{ low_stock_products.count }}</h2>
+          <small class="text-muted">{% translate "Productos bajo el umbral mínimo" %}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Lotes Recientes -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+          <h5 class="card-title fw-bold mb-0">{% translate "Lotes Recientes en Almacén" %}</h5>
+          <a href="{% url 'inventory:batch_list' %}" class="small text-decoration-none" up-follow>{% translate "Ver todos" %} &rarr;</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>{% translate "Código Lote" %}</th>
+                <th>{% translate "Producto" %}</th>
+                <th>{% translate "Proveedor" %}</th>
+                <th>{% translate "Disponible" %}</th>
+                <th>{% translate "Coste Un." %}</th>
+                <th>{% translate "Ingreso" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in recent_batches %}
+                <tr>
+                  <td class="fw-bold font-monospace">{{ b.batch_code }}</td>
+                  <td>{{ b.product.name }}</td>
+                  <td>{{ b.supplier.name|default:"-" }}</td>
+                  <td>
+                    <span class="badge bg-{% if b.available_quantity > 0 %}success{% else %}secondary{% endif %}">
+                      {{ b.available_quantity }} / {{ b.initial_quantity }}
+                    </span>
+                  </td>
+                  <td>${{ b.unit_cost }}</td>
+                  <td>{{ b.received_date|date:"Y-m-d" }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="6" class="text-center py-4 text-muted">{% translate "No hay lotes registrados todavía." %}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas y Órdenes Pendientes -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="card-title fw-bold mb-0 text-danger">
+            <i class="bi bi-exclamation-triangle me-1"></i>{% translate "Alertas de Stock" %}
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush">
+            {% for prod in low_stock_products %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ prod.name }}</div>
+                  <small class="text-muted">SKU: {{ prod.sku }}</small>
+                </div>
+                <span class="badge bg-danger rounded-pill">{{ prod.stock }} un.</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-center text-muted py-3">{% translate "No hay alertas de stock bajo." %}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
