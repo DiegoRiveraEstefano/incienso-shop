@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Cupones de Descuento" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{% translate "Cupones y Promociones Activas" %}</h1>
+      <p class="text-muted mb-0">{% translate "Códigos de descuento para campañas y fidelización." %}</p>
+    </div>
+    <a href="{% url 'discounts:rule_list' %}" class="btn btn-outline-secondary" up-follow>
+      <i class="bi bi-gear me-1"></i>{% translate "Reglas Comerciales" %}
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% translate "Código" %}</th>
+            <th>{% translate "Regla Asociada" %}</th>
+            <th>{% translate "Usos / Límite" %}</th>
+            <th>{% translate "Por Usuario" %}</th>
+            <th>{% translate "Vigencia" %}</th>
+            <th>{% translate "Estado" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in coupons %}
+            <tr>
+              <td class="font-monospace fw-bold text-primary">{{ c.code }}</td>
+              <td>{{ c.discount_rule.name }}</td>
+              <td>{{ c.used_count }} / {% if c.max_uses == 0 %}&infin;{% else %}{{ c.max_uses }}{% endif %}</td>
+              <td>{{ c.max_uses_per_user }}</td>
+              <td>{{ c.valid_from|date:"Y-m-d" }} - {{ c.valid_until|date:"Y-m-d"|default:"Indefinida" }}</td>
+              <td>
+                <span class="badge bg-{% if c.is_usable %}success{% else %}secondary{% endif %}">
+                  {% if c.is_usable %}{% translate "Activo" %}{% else %}{% translate "Expirado" %}{% endif %}
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center py-4 text-muted">{% translate "No hay cupones activos." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

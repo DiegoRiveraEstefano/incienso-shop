@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Segmentos de Clientes" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{% translate "Segmentos y Grupos de Clientes" %}</h1>
+      <p class="text-muted mb-0">{% translate "Agrupación de clientes para campañas dirigidas y beneficios exclusivos." %}</p>
+    </div>
+    <a href="{% url 'crm:kanban' %}" class="btn btn-outline-secondary" up-follow>
+      <i class="bi bi-arrow-left me-1"></i>{% translate "Volver al Pipeline Canvas" %}
+    </a>
+  </div>
+
+  <div class="row g-4">
+    {% for seg in segments %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <h5 class="card-title fw-bold text-primary">{{ seg.name }}</h5>
+            <p class="card-text text-muted small">{{ seg.description|default:"Sin descripción detallada." }}</p>
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+              <span class="badge bg-light text-dark border">
+                <i class="bi bi-people me-1"></i>{{ seg.memberships.count }} {% translate "miembros" %}
+              </span>
+              <span class="badge bg-{% if seg.is_active %}success{% else %}secondary{% endif %}">
+                {% if seg.is_active %}{% translate "Activo" %}{% else %}{% translate "Inactivo" %}{% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info py-4 text-center">
+          {% translate "No hay segmentos configurados todavía." %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

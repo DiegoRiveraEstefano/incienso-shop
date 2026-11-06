@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Reglas de Descuento" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{% translate "Políticas y Reglas de Descuento" %}</h1>
+      <p class="text-muted mb-0">{% translate "Configuración de descuentos porcentuales, montos fijos y mínimos de compra." %}</p>
+    </div>
+    <a href="{% url 'discounts:coupon_list' %}" class="btn btn-outline-secondary" up-follow>
+      <i class="bi bi-ticket-perforated me-1"></i>{% translate "Ver Cupones" %}
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% translate "Nombre de la Regla" %}</th>
+            <th>{% translate "Tipo" %}</th>
+            <th>{% translate "Valor" %}</th>
+            <th>{% translate "Mínimo Pedido" %}</th>
+            <th>{% translate "Categoría" %}</th>
+            <th>{% translate "Estado" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rules %}
+            <tr>
+              <td class="fw-bold">{{ r.name }}</td>
+              <td>{{ r.get_discount_type_display }}</td>
+              <td>
+                {% if r.discount_type == 'PERCENT' %}
+                  {{ r.value }}%
+                {% else %}
+                  ${{ r.value }}
+                {% endif %}
+              </td>
+              <td>${{ r.min_order_amount }}</td>
+              <td>{{ r.target_category.name|default:"Cualquiera" }}</td>
+              <td>
+                <span class="badge bg-{% if r.is_currently_valid %}success{% else %}secondary{% endif %}">
+                  {% if r.is_currently_valid %}{% translate "Vigente" %}{% else %}{% translate "Inactiva" %}{% endif %}
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center py-4 text-muted">{% translate "No hay reglas registradas." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

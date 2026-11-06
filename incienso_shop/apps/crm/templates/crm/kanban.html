@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Embudo de Ventas (Canvas / Kanban)" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">
+        <i class="bi bi-kanban text-primary me-2"></i>{% translate "Embudo de Ventas (Pipeline Canvas)" %}
+      </h1>
+      <p class="text-muted mb-0">{% translate "Gestión ágil de oportunidades comerciales y ventas corporativas." %}</p>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      {% if all_funnels.count > 1 %}
+        <form method="get" class="d-flex gap-2">
+          <select name="funnel" class="form-select form-select-sm" onchange="this.form.submit()">
+            {% for f in all_funnels %}
+              <option value="{{ f.id }}" {% if current_funnel and current_funnel.id == f.id %}selected{% endif %}>
+                {{ f.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </form>
+      {% endif %}
+      <a href="{% url 'crm:segment_list' %}" class="btn btn-outline-secondary btn-sm" up-follow>
+        <i class="bi bi-people me-1"></i>{% translate "Segmentos de Clientes" %}
+      </a>
+      <a href="{% url 'crm:campaign_list' %}" class="btn btn-outline-primary btn-sm" up-follow>
+        <i class="bi bi-envelope me-1"></i>{% translate "Campañas de Email" %}
+      </a>
+    </div>
+  </div>
+
+  {% if current_funnel %}
+    <div id="kanban-canvas" class="row flex-nowrap overflow-auto pb-4" style="min-height: 70vh;">
+      {% for stage in stages %}
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+          <div class="card bg-light border-0 shadow-sm h-100">
+            <!-- Header de Columna -->
+            <div class="card-header bg-white border-bottom-0 py-3 d-flex justify-content-between align-items-center"
+                 style="border-top: 4px solid {{ stage.color_hex }};">
+              <h6 class="fw-bold mb-0 text-dark">{{ stage.name }}</h6>
+              <span class="badge bg-secondary rounded-pill">{{ stage.deals.count }}</span>
+            </div>
+
+            <!-- Cuerpo de Columna con Tarjetas -->
+            <div class="card-body p-2 d-flex flex-column gap-2 overflow-auto" style="max-height: 65vh;">
+              {% for deal in stage.deals.all %}
+                <div class="card shadow-sm border-0 bg-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h6 class="card-title fw-bold text-dark mb-0">{{ deal.title }}</h6>
+                      <span class="badge bg-{% if deal.priority == 'URGENT' %}danger{% elif deal.priority == 'HIGH' %}warning text-dark{% else %}info{% endif %} small">
+                        {{ deal.get_priority_display }}
+                      </span>
+                    </div>
+
+                    <div class="text-muted small mb-2">
+                      <i class="bi bi-building me-1"></i>{{ deal.customer_name }}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                      <span class="fw-bold text-success">${{ deal.estimated_value|intcomma }}</span>
+                      
+                      <!-- Selector rápido de cambio de etapa -->
+                      <form method="post" action="{% url 'crm:move_deal' %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="deal_id" value="{{ deal.id }}">
+                        <input type="hidden" name="funnel_id" value="{{ current_funnel.id }}">
+                        <select name="stage_id" class="form-select form-select-sm" style="width: auto; font-size: 0.75rem;" onchange="this.form.submit()">
+                          {% for s in stages %}
+                            <option value="{{ s.id }}" {% if s.id == stage.id %}selected{% endif %}>
+                              &rarr; {{ s.name }}
+                            </option>
+                          {% endfor %}
+                        </select>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="text-center py-4 text-muted small">
+                  <em>{% translate "Sin tratos en esta etapa" %}</em>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info py-4 text-center">
+      <h5>{% translate "No hay embudos de venta activos." %}</h5>
+      <p class="mb-0">{% translate "Crea un embudo en el panel de administración para visualizar el tablero Canvas." %}</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Campañas de Email CRM" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{% translate "Campañas de Email y Comunicaciones" %}</h1>
+      <p class="text-muted mb-0">{% translate "Envío masivo o segmentado de boletines, ofertas y lanzamientos de inciensos." %}</p>
+    </div>
+    <a href="{% url 'crm:kanban' %}" class="btn btn-outline-secondary" up-follow>
+      <i class="bi bi-arrow-left me-1"></i>{% translate "Volver al Pipeline Canvas" %}
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% translate "Título de Campaña" %}</th>
+            <th>{% translate "Asunto" %}</th>
+            <th>{% translate "Segmento Objetivo" %}</th>
+            <th>{% translate "Destinatarios" %}</th>
+            <th>{% translate "Estado" %}</th>
+            <th>{% translate "Fecha de Envío" %}</th>
+            <th class="text-end">{% translate "Acción" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in campaigns %}
+            <tr>
+              <td class="fw-bold">{{ c.title }}</td>
+              <td>{{ c.subject }}</td>
+              <td>
+                {% if c.segment %}
+                  <span class="badge bg-info text-dark">{{ c.segment.name }}</span>
+                {% else %}
+                  <span class="badge bg-secondary">{% translate "Todos los Clientes" %}</span>
+                {% endif %}
+              </td>
+              <td>{{ c.recipients_count }}</td>
+              <td>
+                <span class="badge bg-{% if c.status == 'SENT' %}success{% elif c.status == 'DRAFT' %}warning text-dark{% else %}danger{% endif %}">
+                  {{ c.get_status_display }}
+                </span>
+              </td>
+              <td>{{ c.sent_at|date:"Y-m-d H:i"|default:"-" }}</td>
+              <td class="text-end">
+                {% if c.status == 'DRAFT' %}
+                  <form method="post" action="{% url 'crm:send_campaign' pk=c.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-primary">
+                      <i class="bi bi-send me-1"></i>{% translate "Enviar Ahora" %}
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="text-muted small">{% translate "Procesada" %}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="text-center py-4 text-muted">{% translate "No hay campañas registradas." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
