@@ -1,0 +1,8 @@
+<div class="btn-group btn-group-sm" role="group" aria-label="Acciones">
+  <a href="{% url 'monitor:health_detail' record.pk %}"
+     class="btn btn-outline-secondary">Ver</a>
+  <a href="{% url 'monitor:health_update' record.pk %}"
+     class="btn btn-outline-primary">Editar</a>
+  <a href="{% url 'monitor:health_delete' record.pk %}"
+     class="btn btn-outline-danger">Eliminar</a>
+</div>
