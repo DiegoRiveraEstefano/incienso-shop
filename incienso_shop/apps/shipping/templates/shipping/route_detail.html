@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Hoja de Ruta" %} {{ route.route_code }} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">
+        {% translate "Hoja de Ruta:" %} <span class="font-monospace text-primary">{{ route.route_code }}</span>
+      </h1>
+      <p class="text-muted mb-0">
+        {% translate "Repartidor:" %} <strong>{{ route.carrier.name }}</strong> ({{ route.carrier.vehicle_plate }}) &bull; {{ route.scheduled_date|date:"Y-m-d" }}
+      </p>
+    </div>
+    <a href="{% url 'shipping:route_list' %}" class="btn btn-outline-secondary" up-follow>
+      <i class="bi bi-arrow-left me-1"></i>{% translate "Volver a Rutas" %}
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+      <h5 class="card-title fw-bold mb-0">{% translate "Secuencia de Paradas de Entrega" %}</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% translate "Parada #" %}</th>
+            <th>{% translate "Destinatario" %}</th>
+            <th>{% translate "Dirección" %}</th>
+            <th>{% translate "Comuna / Ciudad" %}</th>
+            <th>{% translate "Tracking" %}</th>
+            <th>{% translate "Estado" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for stop in route.stops.all %}
+            <tr>
+              <td class="fw-bold">{{ stop.stop_order }}</td>
+              <td>{{ stop.shipment.recipient_name }}</td>
+              <td>{{ stop.shipment.shipping_address }}</td>
+              <td>{{ stop.shipment.shipping_city }}</td>
+              <td>
+                <a href="{% url 'shipping:tracking_detail' tracking_number=stop.shipment.tracking_number %}" class="font-monospace" up-follow>
+                  {{ stop.shipment.tracking_number }}
+                </a>
+              </td>
+              <td>
+                <span class="badge bg-{% if stop.is_completed %}success{% else %}warning text-dark{% endif %}">
+                  {% if stop.is_completed %}{% translate "Entregado" %}{% else %}{% translate "Pendiente" %}{% endif %}
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center py-4 text-muted">{% translate "No hay paradas asociadas a esta ruta." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

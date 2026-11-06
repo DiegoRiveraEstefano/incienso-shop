@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Rutas de Entrega - Última Milla" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">{% translate "Hojas de Ruta de Entrega (Última Milla)" %}</h1>
+      <p class="text-muted mb-0">{% translate "Planificación logística y asignación de despachos a repartidores." %}</p>
+    </div>
+    <a href="{% url 'shipping:tracking' %}" class="btn btn-outline-primary" up-follow>
+      <i class="bi bi-search me-1"></i>{% translate "Portal de Rastreo" %}
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% translate "Código de Ruta" %}</th>
+            <th>{% translate "Repartidor" %}</th>
+            <th>{% translate "Vehículo" %}</th>
+            <th>{% translate "Fecha Programada" %}</th>
+            <th>{% translate "Paradas" %}</th>
+            <th>{% translate "Estado" %}</th>
+            <th class="text-end">{% translate "Detalle" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in routes %}
+            <tr>
+              <td class="fw-bold font-monospace">{{ r.route_code }}</td>
+              <td>{{ r.carrier.name }}</td>
+              <td>{{ r.carrier.vehicle_plate|default:"-" }}</td>
+              <td>{{ r.scheduled_date|date:"Y-m-d" }}</td>
+              <td><span class="badge bg-secondary rounded-pill">{{ r.stops.count }}</span></td>
+              <td>
+                <span class="badge bg-{% if r.status == 'COMPLETED' %}success{% elif r.status == 'IN_PROGRESS' %}warning text-dark{% else %}info{% endif %}">
+                  {{ r.get_status_display }}
+                </span>
+              </td>
+              <td class="text-end">
+                <a href="{% url 'shipping:route_detail' route_code=r.route_code %}" class="btn btn-sm btn-outline-secondary" up-follow>
+                  {% translate "Ver Hoja" %} &rarr;
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="text-center py-4 text-muted">{% translate "No hay rutas activas planificadas." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
