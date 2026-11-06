@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% load static i18n %}
+
+{% block title %}
+  {% translate "Perfil de Usuario:" %} {{ object.username }} | Incienso Shop
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="py-4">
+    <header class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
+      <div>
+        <span class="badge text-bg-primary mb-1">{% translate "Perfil de Miembro" %}</span>
+        <h1 class="h3 mb-0 fw-bold">{{ object.name|default:object.username }}</h1>
+        <p class="text-body-secondary small mb-0">@{{ object.username }} · {{ object.email|default:"Sin email" }}</p>
+      </div>
+      {% if object == request.user %}
+        <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
+          <a class="btn btn-primary btn-sm" href="{% url 'users:update' %}" role="button">
+            {% translate "Editar Perfil" %}
+          </a>
+          <a class="btn btn-outline-secondary btn-sm" href="{% url 'account_email' %}" role="button">
+            {% translate "Gestionar Email" %}
+          </a>
+          <a class="btn btn-outline-secondary btn-sm" href="{% url 'account_change_password' %}" role="button">
+            {% translate "Contraseña" %}
+          </a>
+        </div>
+      {% endif %}
+    </header>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <article class="card border-0 shadow-sm h-100">
+          <header class="card-header bg-white py-3">
+            <h2 class="h6 mb-0 fw-bold">{% translate "Información de la Cuenta" %}</h2>
+          </header>
+          <div class="card-body">
+            <dl class="row mb-0">
+              <dt class="col-sm-4 text-body-secondary">{% translate "Usuario" %}</dt>
+              <dd class="col-sm-8 fw-semibold">{{ object.username }}</dd>
+              <dt class="col-sm-4 text-body-secondary">{% translate "Nombre Completo" %}</dt>
+              <dd class="col-sm-8">{{ object.name|default:"—" }}</dd>
+              <dt class="col-sm-4 text-body-secondary">{% translate "Correo Electrónico" %}</dt>
+              <dd class="col-sm-8">{{ object.email|default:"—" }}</dd>
+              <dt class="col-sm-4 text-body-secondary">{% translate "Estado" %}</dt>
+              <dd class="col-sm-8">
+                {% if object.is_active %}
+                  <span class="badge text-bg-success">{% translate "Activo" %}</span>
+                {% else %}
+                  <span class="badge text-bg-danger">{% translate "Inactivo" %}</span>
+                {% endif %}
+                {% if object.is_superuser %}
+                  <span class="badge text-bg-dark ms-1">{% translate "Superusuario" %}</span>
+                {% endif %}
+                {% if object.is_staff %}
+                  <span class="badge text-bg-info ms-1">{% translate "Staff" %}</span>
+                {% endif %}
+              </dd>
+              <dt class="col-sm-4 text-body-secondary mb-0">{% translate "Fecha de Registro" %}</dt>
+              <dd class="col-sm-8 mb-0">{{ object.date_joined|date:"Y-m-d H:i" }}</dd>
+            </dl>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-lg-4">
+        <article class="card border-0 shadow-sm h-100">
+          <header class="card-header bg-white py-3">
+            <h2 class="h6 mb-0 fw-bold">{% translate "Grupos y Roles Asignados (RBAC)" %}</h2>
+          </header>
+          <div class="card-body">
+            {% with user_groups=object.groups.all %}
+              {% if user_groups %}
+                <div class="d-flex flex-wrap gap-2">
+                  {% for group in user_groups %}
+                    <span class="badge text-bg-primary">{{ group.name }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="text-body-secondary small mb-0">
+                  {% translate "Sin grupos asignados específicamente." %}
+                </p>
+              {% endif %}
+            {% endwith %}
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+{% endblock content %}
