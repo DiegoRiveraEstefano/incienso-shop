@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {{ page_title|default:"Formulario" }} | RRSS Creators Analyzer
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="container py-4">
+    <header class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 mb-1">{{ page_title|default:"Guardar Registro" }}</h1>
+        {% if page_subtitle %}
+          <p class="text-body-secondary mb-0">{{ page_subtitle }}</p>
+        {% endif %}
+      </div>
+      {% if cancel_url %}
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Volver al listado</a>
+      {% endif %}
+    </header>
+    <section aria-labelledby="form-section-heading" class="card shadow-sm">
+      <div class="card-header bg-transparent py-3">
+        <h2 id="form-section-heading" class="h6 mb-0">Datos del Registro</h2>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          {% if form.helper %}
+            {% crispy form %}
+          {% else %}
+            {{ form|crispy }}
+          {% endif %}
+          <footer class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            {% if cancel_url %}
+              <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancelar</a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </footer>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

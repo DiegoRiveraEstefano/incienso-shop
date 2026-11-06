@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{ page_title|default:"Detalle" }} | RRSS Creators Analyzer
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="container py-4">
+    <header class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <h1 class="h3 mb-1">{{ object }}</h1>
+        <p class="text-body-secondary mb-0">{{ page_title|default:"Detalle del registro" }}</p>
+      </div>
+      <div class="d-flex gap-2">
+        {% if list_url %}
+          <a href="{{ list_url }}" class="btn btn-outline-secondary">Listado</a>
+        {% endif %}
+        {% if update_url %}
+          <a href="{{ update_url }}" class="btn btn-primary">Editar</a>
+        {% endif %}
+        {% if delete_url %}
+          <a href="{{ delete_url }}" class="btn btn-outline-danger">Eliminar</a>
+        {% endif %}
+      </div>
+    </header>
+    <article class="card shadow-sm">
+      <div class="card-header bg-transparent py-3">
+        <h2 class="h6 mb-0">Información General</h2>
+      </div>
+      <div class="card-body">
+        {% block detail_body %}
+          <dl class="row mb-0">
+            {% for label, value in object_fields %}
+              <dt class="col-sm-4 text-body-secondary">{{ label }}</dt>
+              <dd class="col-sm-8">
+                {{ value|default:"—" }}
+              </dd>
+            {% endfor %}
+          </dl>
+        {% endblock detail_body %}
+      </div>
+    </article>
+  </main>
+{% endblock content %}

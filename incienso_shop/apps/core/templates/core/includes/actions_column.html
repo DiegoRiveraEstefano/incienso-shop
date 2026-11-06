@@ -1,0 +1,10 @@
+<div class="btn-group btn-group-sm"
+     role="group"
+     aria-label="Acciones de fila">
+  <a href="{% url 'core:settings_detail' record.pk %}"
+     class="btn btn-outline-secondary">Ver</a>
+  <a href="{% url 'core:settings_update' record.pk %}"
+     class="btn btn-outline-primary">Editar</a>
+  <a href="{% url 'core:settings_delete' record.pk %}"
+     class="btn btn-outline-danger">Eliminar</a>
+</div>

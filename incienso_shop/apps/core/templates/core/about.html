@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% translate "Acerca del Sistema" %} | RRSS Creators Analyzer
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="py-4">
+    <header class="mb-4 pb-3 border-bottom">
+      <span class="badge text-bg-secondary mb-2">{% translate "Arquitectura y Alcance" %}</span>
+      <h1 class="h2 fw-bold mb-1">RRSS Creators Analyzer</h1>
+      <p class="text-body-secondary mb-0">
+        {% translate "Plataforma single-company para la gestión integral de streamers, creadores de contenido, contratos y analítica multiplataforma." %}
+      </p>
+    </header>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <article class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3">{% translate "Stack Tecnológico" %}</h2>
+            <dl class="row mb-0">
+              <dt class="col-sm-4 text-body-secondary">{% translate "Backend" %}</dt>
+              <dd class="col-sm-8">Python 3.14 & Django 6.0 (Service + Selector Layer)</dd>
+              <dt class="col-sm-4 text-body-secondary">{% translate "Base de Datos" %}</dt>
+              <dd class="col-sm-8">SQLite 3 en modo WAL con transacciones inmediatas</dd>
+              <dt class="col-sm-4 text-body-secondary">{% translate "Caché" %}</dt>
+              <dd class="col-sm-8">DiskCache persistente en disco/memoria compartida</dd>
+              <dt class="col-sm-4 text-body-secondary">{% translate "Frontend" %}</dt>
+              <dd class="col-sm-8">HTML5 Semántico, Bootstrap 5, Vanilla JS y Web Components</dd>
+              <dt class="col-sm-4 text-body-secondary">{% translate "Componentes UI" %}</dt>
+              <dd class="col-sm-8">django-tables2, django-filter, django-crispy-forms, widget-tweaks</dd>
+              <dt class="col-sm-4 text-body-secondary mb-0">{% translate "Seguridad" %}</dt>
+              <dd class="col-sm-8 mb-0">Sistema nativo de Grupos y Permisos de Django + django-simple-history</dd>
+            </dl>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-lg-6">
+        <article class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3">{% translate "Módulos del Sistema" %}</h2>
+            <p class="text-body-secondary small">
+              {% translate "El sistema se estructura en 18 aplicaciones modulares con templates por aplicación:" %}
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge text-bg-dark">core</span>
+              <span class="badge text-bg-dark">users</span>
+              <span class="badge text-bg-dark">permissions</span>
+              <span class="badge text-bg-dark">members</span>
+              <span class="badge text-bg-primary">creators</span>
+              <span class="badge text-bg-primary">contracts</span>
+              <span class="badge text-bg-primary">streams</span>
+              <span class="badge text-bg-primary">videos</span>
+              <span class="badge text-bg-primary">alerts</span>
+              <span class="badge text-bg-success">campaigns</span>
+              <span class="badge text-bg-success">payouts</span>
+              <span class="badge text-bg-success">analytics</span>
+              <span class="badge text-bg-secondary">imports</span>
+              <span class="badge text-bg-secondary">exports</span>
+              <span class="badge text-bg-secondary">audit</span>
+              <span class="badge text-bg-secondary">logs</span>
+              <span class="badge text-bg-secondary">monitor</span>
+              <span class="badge text-bg-secondary">backups</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+{% endblock content %}

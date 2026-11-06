@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% load i18n humanize %}
+
+{% block title %}
+  {% translate "Panel Principal" %} | RRSS Creators Analyzer
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="py-4">
+    {% if request.user.is_authenticated %}
+      <header class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+          <span class="badge text-bg-dark mb-1">
+            {% if company_settings %}
+              {{ company_settings.company_name }}
+            {% else %}
+              RRSS Creators Analyzer
+            {% endif %}
+          </span>
+          <h1 class="h3 mb-0 fw-bold">{% translate "Panel Ejecutivo de Creadores y Operaciones" %}</h1>
+          <p class="text-body-secondary small mb-0">
+            {% translate "Bienvenido," %} <strong>{{ request.user.name|default:request.user.username }}</strong>.
+            {% translate "Monitoreo centralizado de roster, canales, streams, videos, campañas y finanzas." %}
+          </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
+          <a href="{% url 'creators:creator_create' %}" class="btn btn-primary btn-sm">
+            + {% translate "Nuevo Creador" %}
+          </a>
+          <a href="{% url 'streams:session_create' %}" class="btn btn-outline-primary btn-sm">
+            + {% translate "Registrar Stream" %}
+          </a>
+          <a href="{% url 'videos:video_create' %}" class="btn btn-outline-secondary btn-sm">
+            + {% translate "Registrar Video" %}
+          </a>
+          <a href="{% url 'imports:batch_create' %}" class="btn btn-outline-dark btn-sm">
+            {% translate "Importar Datos" %}
+          </a>
+        </div>
+      </header>
+
+      <section aria-label="{% translate 'Indicadores Clave' %}" class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+          <article class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="text-body-secondary small text-uppercase fw-semibold mb-1">{% translate "Creadores" %}</p>
+              <h2 class="h3 fw-bold mb-1">{{ creators_total|default:0 }}</h2>
+              <span class="badge text-bg-success">{{ creators_active|default:0 }} {% translate "activos" %}</span>
+            </div>
+          </article>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <article class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="text-body-secondary small text-uppercase fw-semibold mb-1">{% translate "Canales" %}</p>
+              <h2 class="h3 fw-bold mb-1">{{ channels_total|default:0 }}</h2>
+              <span class="badge text-bg-danger">{{ channels_live|default:0 }} {% translate "en vivo" %}</span>
+            </div>
+          </article>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <article class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="text-body-secondary small text-uppercase fw-semibold mb-1">{% translate "Streams" %}</p>
+              <h2 class="h3 fw-bold mb-1">{{ sessions_total|default:0 }}</h2>
+              <a href="{% url 'streams:session_list' %}" class="small text-decoration-none">{% translate "Ver sesiones" %} →</a>
+            </div>
+          </article>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <article class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="text-body-secondary small text-uppercase fw-semibold mb-1">{% translate "Videos / Clips" %}</p>
+              <h2 class="h3 fw-bold mb-1">{{ videos_total|default:0 }}</h2>
+              <a href="{% url 'videos:video_list' %}" class="small text-decoration-none">{% translate "Ver catálogo" %} →</a>
+            </div>
+          </article>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <article class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="text-body-secondary small text-uppercase fw-semibold mb-1">{% translate "Campañas Activas" %}</p>
+              <h2 class="h3 fw-bold mb-1">{{ campaigns_active|default:0 }}</h2>
+              <a href="{% url 'campaigns:campaign_list' %}" class="small text-decoration-none">{% translate "Ver sponsors" %} →</a>
+            </div>
+          </article>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <article class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="text-body-secondary small text-uppercase fw-semibold mb-1">{% translate "Alertas / Strikes" %}</p>
+              <h2 class="h3 fw-bold mb-1">{{ alerts_open|default:0 }}</h2>
+              <a href="{% url 'alerts:alert_list' %}" class="small text-decoration-none">{% translate "Revisar alertas" %} →</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+          <article class="card border-0 shadow-sm h-100">
+            <header class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <h2 class="h6 mb-0 fw-bold">{% translate "Últimos Creadores Incorporados" %}</h2>
+              <a href="{% url 'creators:creator_list' %}" class="btn btn-sm btn-outline-secondary">{% translate "Ver todos" %}</a>
+            </header>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col">{% translate "Creador" %}</th>
+                      <th scope="col">{% translate "Plataforma" %}</th>
+                      <th scope="col">{% translate "Tier" %}</th>
+                      <th scope="col">{% translate "Estado" %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for creator in recent_creators %}
+                      <tr>
+                        <td>
+                          <a href="{{ creator.get_absolute_url }}" class="fw-semibold text-decoration-none">
+                            {{ creator.display_name }}
+                          </a>
+                          <div class="small text-body-secondary">@{{ creator.handle }}</div>
+                        </td>
+                        <td>{{ creator.get_primary_platform_display }}</td>
+                        <td><span class="badge text-bg-secondary">{{ creator.get_tier_display }}</span></td>
+                        <td><span class="badge text-bg-info">{{ creator.get_status_display }}</span></td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="4" class="text-center text-body-secondary py-4">
+                          {% translate "No hay creadores registrados todavía." %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="col-lg-6">
+          <article class="card border-0 shadow-sm h-100">
+            <header class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <h2 class="h6 mb-0 fw-bold">{% translate "Alertas y Strikes Recientes" %}</h2>
+              <a href="{% url 'alerts:alert_list' %}" class="btn btn-sm btn-outline-secondary">{% translate "Ver alertas" %}</a>
+            </header>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col">{% translate "Alerta" %}</th>
+                      <th scope="col">{% translate "Creador" %}</th>
+                      <th scope="col">{% translate "Severidad" %}</th>
+                      <th scope="col">{% translate "Estado" %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for alert in recent_alerts %}
+                      <tr>
+                        <td>
+                          <a href="{{ alert.get_absolute_url }}" class="fw-semibold text-decoration-none">
+                            {{ alert.title }}
+                          </a>
+                        </td>
+                        <td>{{ alert.creator.display_name }}</td>
+                        <td><span class="badge text-bg-warning">{{ alert.get_severity_display }}</span></td>
+                        <td><span class="badge text-bg-secondary">{{ alert.get_status_display }}</span></td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="4" class="text-center text-body-secondary py-4">
+                          {% translate "Sin alertas ni strikes activos." %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <section aria-label="{% translate 'Directorio de Módulos' %}">
+        <h2 class="h5 fw-bold mb-3">{% translate "Acceso Rápido por Módulo" %}</h2>
+        <div class="row g-3">
+          <div class="col-md-6 col-lg-3">
+            <article class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h3 class="h6 fw-bold">{% translate "Talento y Contratos" %}</h3>
+                <ul class="list-unstyled small mb-0 d-grid gap-1">
+                  <li><a href="{% url 'creators:creator_list' %}" class="text-decoration-none">{% translate "Directorio de Creadores" %}</a></li>
+                  <li><a href="{% url 'creators:channel_list' %}" class="text-decoration-none">{% translate "Canales por Plataforma" %}</a></li>
+                  <li><a href="{% url 'creators:snapshot_list' %}" class="text-decoration-none">{% translate "Snapshots Históricos" %}</a></li>
+                  <li><a href="{% url 'contracts:contract_list' %}" class="text-decoration-none">{% translate "Contratos y Revenue Share" %}</a></li>
+                </ul>
+              </div>
+            </article>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <article class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h3 class="h6 fw-bold">{% translate "Contenido y Métricas" %}</h3>
+                <ul class="list-unstyled small mb-0 d-grid gap-1">
+                  <li><a href="{% url 'streams:session_list' %}" class="text-decoration-none">{% translate "Sesiones de Streaming" %}</a></li>
+                  <li><a href="{% url 'streams:segment_list' %}" class="text-decoration-none">{% translate "Segmentos por Categoría" %}</a></li>
+                  <li><a href="{% url 'videos:video_list' %}" class="text-decoration-none">{% translate "Videos, Shorts y VODs" %}</a></li>
+                  <li><a href="{% url 'videos:publication_list' %}" class="text-decoration-none">{% translate "Publicaciones Multiplataforma" %}</a></li>
+                </ul>
+              </div>
+            </article>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <article class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h3 class="h6 fw-bold">{% translate "Comercial y Finanzas" %}</h3>
+                <ul class="list-unstyled small mb-0 d-grid gap-1">
+                  <li><a href="{% url 'campaigns:campaign_list' %}" class="text-decoration-none">{% translate "Campañas de Sponsors" %}</a></li>
+                  <li><a href="{% url 'campaigns:deliverable_list' %}" class="text-decoration-none">{% translate "Entregables Comerciales" %}</a></li>
+                  <li><a href="{% url 'payouts:payout_list' %}" class="text-decoration-none">{% translate "Liquidaciones y Pagos" %}</a></li>
+                  <li><a href="{% url 'analytics:snapshot_list' %}" class="text-decoration-none">{% translate "Snapshots Analíticos" %}</a></li>
+                </ul>
+              </div>
+            </article>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <article class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h3 class="h6 fw-bold">{% translate "Operaciones y Sistema" %}</h3>
+                <ul class="list-unstyled small mb-0 d-grid gap-1">
+                  <li><a href="{% url 'permissions:role_list' %}" class="text-decoration-none">{% translate "Grupos y Permisos RBAC" %}</a></li>
+                  <li><a href="{% url 'members:invitation_list' %}" class="text-decoration-none">{% translate "Invitaciones y Asignaciones" %}</a></li>
+                  <li><a href="{% url 'monitor:health_list' %}" class="text-decoration-none">{% translate "Monitor SQLite WAL / DiskCache" %}</a></li>
+                  <li><a href="{% url 'backups:backup_list' %}" class="text-decoration-none">{% translate "Backups y Auditoría" %}</a></li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    {% else %}
+      <section class="py-5">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-7">
+            <span class="badge text-bg-primary mb-3">{% translate "Plataforma Interna de Gestión de Talento" %}</span>
+            <h1 class="display-5 fw-bold mb-3">RRSS Creators Analyzer</h1>
+            <p class="lead text-body-secondary mb-4">
+              {% translate "Sistema centralizado para el seguimiento de streamers y creadores de contenido, métricas de sesiones en vivo, publicaciones de video, contratos de agencia, alertas de canal y liquidaciones financieras." %}
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+              <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg px-4">
+                {% translate "Iniciar Sesión" %}
+              </a>
+              {% if ACCOUNT_ALLOW_REGISTRATION %}
+                <a href="{% url 'account_signup' %}" class="btn btn-outline-secondary btn-lg px-4">
+                  {% translate "Crear Cuenta" %}
+                </a>
+              {% endif %}
+              <a href="{% url 'about' %}" class="btn btn-link btn-lg text-decoration-none">
+                {% translate "Conocer más" %} →
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <article class="card border-0 shadow-sm">
+              <div class="card-body p-4">
+                <h2 class="h5 fw-bold mb-3">{% translate "Capacidades de la Plataforma" %}</h2>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item px-0">
+                    <strong>{% translate "Roster & Canales:" %}</strong>
+                    {% translate "Twitch, YouTube, Kick, TikTok, Instagram y X con snapshots diarios." %}
+                  </li>
+                  <li class="list-group-item px-0">
+                    <strong>{% translate "Streams & Videos:" %}</strong>
+                    {% translate "CCV promedio, Peak Viewers, horas vistas, costos de producción y RPM." %}
+                  </li>
+                  <li class="list-group-item px-0">
+                    <strong>{% translate "Contratos & Payouts:" %}</strong>
+                    {% translate "Splits de agencia/creador, campañas de patrocinio y liquidaciones." %}
+                  </li>
+                  <li class="list-group-item px-0">
+                    <strong>{% translate "Operación Segura:" %}</strong>
+                    {% translate "Permisos nativos de Django, auditoría completa, SQLite WAL y DiskCache." %}
+                  </li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    {% endif %}
+  </main>
+{% endblock content %}
