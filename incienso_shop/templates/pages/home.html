@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inicio - Incienso Shop Artesanal{% endblock title %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-white py-5 mb-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #2b1f1d 0%, #4a2c20 50%, #201715 100%);">
+  <div class="container py-lg-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">
+          <i class="bi bi-stars me-1"></i> Aromaterapia & Conexión Espiritual
+        </span>
+        <h1 class="display-4 fw-bold lh-1 mb-3">
+          Aromas Sagrados y Resinas Naturales para tu Espacio
+        </h1>
+        <p class="lead text-light-50 mb-4" style="color: #e0d5cf;">
+          Inciensos elaborados artesanalmente con maderas nobles como sándalo y palo santo,
+          resinas puras de copal y mirra, y flores sagradas cosechadas éticamente.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url 'products:product_list' %}" class="btn btn-warning btn-lg px-4 fw-semibold shadow-sm" up-follow>
+            <i class="bi bi-compass me-2"></i> Explorar Catálogo
+          </a>
+          <a href="{% url 'about' %}" class="btn btn-outline-light btn-lg px-4" up-follow>
+            Conoce Nuestro Proceso
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-5 text-center">
+        <div class="card bg-dark bg-opacity-50 border-warning border-opacity-25 shadow-lg p-4 rounded-4 backdrop-blur">
+          <i class="bi bi-flower2 text-warning display-1 mb-3"></i>
+          <h4 class="text-white mb-2">100% Puro & Botánico</h4>
+          <p class="text-muted small mb-3">
+            Libre de fragancias sintéticas, derivados de petróleo o acelerantes químicos.
+          </p>
+          <div class="row text-center g-2 text-light small">
+            <div class="col-4 border-end border-secondary">
+              <span class="d-block fw-bold text-warning fs-5">45+</span>
+              <span>Minutos quemado</span>
+            </div>
+            <div class="col-4 border-end border-secondary">
+              <span class="d-block fw-bold text-warning fs-5">6</span>
+              <span>Familias olfativas</span>
+            </div>
+            <div class="col-4">
+              <span class="d-block fw-bold text-warning fs-5">100%</span>
+              <span>Biodegradable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categorías Olfativas -->
+<section class="container mb-5" aria-labelledby="heading-categories">
+  <div class="text-center mb-4">
+    <h2 id="heading-categories" class="fw-bold">Familias Aromáticas Principales</h2>
+    <p class="text-muted">Descubre la fragancia perfecta según la intención y energía de tu ambiente.</p>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4 col-sm-6">
+      <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden aroma-card hover-lift">
+        <div class="card-body p-4 text-center">
+          <div class="icon-circle bg-warning bg-opacity-10 text-warning mx-auto mb-3">
+            <i class="bi bi-gem fs-2"></i>
+          </div>
+          <h5 class="fw-bold">Resinas Naturales</h5>
+          <p class="text-muted small">Copal blanco, Mirra de Somalia e Incienso Olibano para limpiezas profundas.</p>
+          <a href="{% url 'products:product_list' %}?aroma_family=RESINAS" class="btn btn-sm btn-outline-dark rounded-pill" up-follow>Ver Resinas</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+      <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden aroma-card hover-lift">
+        <div class="card-body p-4 text-center">
+          <div class="icon-circle bg-warning bg-opacity-10 text-warning mx-auto mb-3">
+            <i class="bi bi-tree fs-2"></i>
+          </div>
+          <h5 class="fw-bold">Maderas Sagradas</h5>
+          <p class="text-muted small">Palo Santo recolectado sustentablemente, Cedro de Atlas y Sándalo de Mysore.</p>
+          <a href="{% url 'products:product_list' %}?aroma_family=MADERAS" class="btn btn-sm btn-outline-dark rounded-pill" up-follow>Ver Maderas</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+      <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden aroma-card hover-lift">
+        <div class="card-body p-4 text-center">
+          <div class="icon-circle bg-warning bg-opacity-10 text-warning mx-auto mb-3">
+            <i class="bi bi-flower1 fs-2"></i>
+          </div>
+          <h5 class="fw-bold">Florales & Dulces</h5>
+          <p class="text-muted small">Lavanda francesa, Rosa de Damasco y Jazmín nocturno para calma y serenidad.</p>
+          <a href="{% url 'products:product_list' %}?aroma_family=FLORALES" class="btn btn-sm btn-outline-dark rounded-pill" up-follow>Ver Florales</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Beneficios / Banner Informativo -->
+<section class="bg-white py-5 mb-5 border-top border-bottom">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-md-3 col-6">
+        <i class="bi bi-shield-check text-warning display-5 mb-2"></i>
+        <h6 class="fw-bold mb-1">Pago Seguro</h6>
+        <p class="text-muted small mb-0">Integración con django-payments</p>
+      </div>
+      <div class="col-md-3 col-6">
+        <i class="bi bi-box-seam text-warning display-5 mb-2"></i>
+        <h6 class="fw-bold mb-1">Despacho Rápido</h6>
+        <p class="text-muted small mb-0">Embalaje ecológico libre de plásticos</p>
+      </div>
+      <div class="col-md-3 col-6">
+        <i class="bi bi-lightning-charge text-warning display-5 mb-2"></i>
+        <h6 class="fw-bold mb-1">Navegación Ágil</h6>
+        <p class="text-muted small mb-0">Interactividad reactiva con Unpoly</p>
+      </div>
+      <div class="col-md-3 col-6">
+        <i class="bi bi-recycle text-warning display-5 mb-2"></i>
+        <h6 class="fw-bold mb-1">Sostenible</h6>
+        <p class="text-muted small mb-0">Cero componentes artificiales</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to action catálogo -->
+<section class="container text-center mb-5">
+  <div class="p-5 rounded-4 bg-dark text-white shadow-sm position-relative">
+    <h2 class="fw-bold mb-3">¿Listo para transformar tu atmósfera?</h2>
+    <p class="text-light-50 mb-4 mx-auto" style="max-width: 600px;">
+      Revisa nuestra selección completa de varillas artesanales, conos y resinas puras.
+    </p>
+    <a href="{% url 'products:product_list' %}" class="btn btn-warning btn-lg px-4" up-follow>
+      Ver Catálogo de Inciensos
+    </a>
+  </div>
+</section>
+{% endblock content %}

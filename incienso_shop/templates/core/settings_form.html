@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Editar Configuración de Tienda{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+      <h4 class="mb-0">Editar Parámetros de la Tienda</h4>
+    </div>
+    <div class="card-body">
+      {% crispy form %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

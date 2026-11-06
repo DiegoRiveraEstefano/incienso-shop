@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% translate "Acceso Denegado (403)" %} | Incienso Shop
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <article class="card border-0 shadow-sm text-center p-4">
+          <div class="card-body">
+            <span class="badge text-bg-danger mb-2">HTTP 403</span>
+            <h1 class="h3 fw-bold mb-3">{% translate "Acceso Denegado (403)" %}</h1>
+            <p class="text-body-secondary mb-4">
+              {% if exception %}
+                {{ exception }}
+              {% else %}
+                {% translate "No cuentas con los permisos necesarios en tu grupo de rol para acceder a esta sección." %}
+              {% endif %}
+            </p>
+            <a href="{% url 'home' %}" class="btn btn-primary">{% translate "Volver al Inicio" %}</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+{% endblock content %}

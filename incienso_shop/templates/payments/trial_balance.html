@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% translate "Libro Contable de Partida Doble" %} - Incienso Shop{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">
+        <i class="bi bi-journal-bookmark text-primary me-2"></i>{% translate "Libro Diario & Balance de Partida Doble" %}
+      </h1>
+      <p class="text-muted mb-0">{% translate "Contabilidad financiera de transacciones, pasarelas de pago y ventas." %}</p>
+    </div>
+    <div>
+      <span class="badge bg-{% if trial_balance.is_balanced %}success{% else %}danger{% endif %} fs-6 px-3 py-2">
+        <i class="bi bi-shield-check me-1"></i>
+        {% if trial_balance.is_balanced %}{% translate "Libro Cuadrado (Débito = Crédito)" %}{% else %}{% translate "Desbalance Detectado" %}{% endif %}
+      </span>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+      <h5 class="card-title fw-bold mb-0">{% translate "Balance de Comprobación de Sumas y Saldos (Trial Balance)" %}</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% translate "Código" %}</th>
+            <th>{% translate "Cuenta Contable" %}</th>
+            <th>{% translate "Tipo de Cuenta" %}</th>
+            <th class="text-end">{% translate "Total Débito (Debe)" %}</th>
+            <th class="text-end">{% translate "Total Crédito (Haber)" %}</th>
+            <th class="text-end">{% translate "Saldo Neto" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in trial_balance.rows %}
+            <tr>
+              <td class="font-monospace fw-bold">{{ r.account.code }}</td>
+              <td>{{ r.account.name }}</td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ r.account.get_account_type_display }}</span>
+              </td>
+              <td class="text-end font-monospace">${{ r.debits|intcomma }}</td>
+              <td class="text-end font-monospace">${{ r.credits|intcomma }}</td>
+              <td class="text-end font-monospace fw-bold text-{% if r.balance >= 0 %}success{% else %}danger{% endif %}">
+                ${{ r.balance|intcomma }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center py-4 text-muted">{% translate "No hay movimientos contables registrados." %}</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="table-dark">
+          <tr class="fw-bold">
+            <td colspan="3">{% translate "TOTALES GENERALES:" %}</td>
+            <td class="text-end font-monospace">${{ trial_balance.grand_total_debits|intcomma }}</td>
+            <td class="text-end font-monospace">${{ trial_balance.grand_total_credits|intcomma }}</td>
+            <td class="text-end font-monospace">
+              {% if trial_balance.is_balanced %}
+                <span class="badge bg-success">&Delta; $0.00</span>
+              {% else %}
+                <span class="badge bg-danger">&Delta; Descuadre</span>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

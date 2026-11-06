@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Pago Seguro del Pedido - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <div class="card border-0 shadow-lg rounded-4 p-4 bg-white">
+        <div class="text-center mb-4">
+          <div class="icon-circle bg-warning bg-opacity-10 text-warning mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+            <i class="bi bi-shield-lock fs-1"></i>
+          </div>
+          <h3 class="fw-bold mb-1">Pasarela de Pago Seguro</h3>
+          <p class="text-muted small">Integrado con <code>django-payments</code></p>
+        </div>
+
+        <div class="p-3 bg-light rounded-3 mb-4 border">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Pedido:</span>
+            <span class="fw-bold small">#{{ order.order_number|stringformat:'.8s' }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Cliente:</span>
+            <span class="small">{{ order.customer_name }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Total a pagar:</span>
+            <span class="fw-bold text-success fs-5">${{ payment.total }} {{ payment.currency }}</span>
+          </div>
+        </div>
+
+        {% if form %}
+          <form method="post" action="{{ payment.get_process_url }}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm mt-3">
+              <i class="bi bi-credit-card me-1"></i> Pagar ${{ payment.total }}
+            </button>
+          </form>
+        {% else %}
+          <!-- Modo Demo / Dummy Provider -->
+          <form method="post" action="{% url 'shop_payments:payment_success' order.order_number %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-muted">Proveedor de Pago</label>
+              <select class="form-select" disabled>
+                <option selected>Dummy Payment Provider (Entorno de Pruebas / Portfolio Demo)</option>
+              </select>
+            </div>
+            <div class="alert alert-info py-2 small mb-3">
+              <i class="bi bi-info-circle me-1"></i> Esta es una simulación de pago seguro conectada con <code>django-payments</code>. Al hacer clic en el botón inferior se simulará una transacción aprobada y confirmada.
+            </div>
+            <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm">
+              <i class="bi bi-check2-circle me-1"></i> Simular Confirmación de Pago
+            </button>
+          </form>
+        {% endif %}
+
+        <div class="text-center mt-3">
+          <a href="{% url 'orders:order_detail' order.order_number %}" class="text-muted small text-decoration-none" up-follow>
+            <i class="bi bi-arrow-left me-1"></i> Volver a los detalles del pedido
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

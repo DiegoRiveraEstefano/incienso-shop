@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Pedido #{{ order.order_number|stringformat:'.8s' }} - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+      <div>
+        <span class="badge bg-secondary mb-1">{{ order.get_status_display }}</span>
+        <h2 class="h3 fw-bold mb-0">Pedido #{{ order.order_number }}</h2>
+        <span class="text-muted small">Registrado el {{ order.created_at|date:"d M Y, H:i" }}</span>
+      </div>
+      <div class="d-flex gap-2">
+        {% if order.shipment %}
+          <a href="{% url 'shipping:tracking_detail' tracking_number=order.shipment.tracking_number %}" class="btn btn-outline-primary fw-semibold" up-follow>
+            <i class="bi bi-truck me-1"></i> Rastrear Envío ({{ order.shipment.get_status_display }})
+          </a>
+        {% endif %}
+        {% if order.status == "PENDING" %}
+          <a href="{% url 'shop_payments:start_payment' order.order_number %}" class="btn btn-warning fw-semibold" up-follow>
+            <i class="bi bi-credit-card me-1"></i> Completar Pago
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <h6 class="fw-bold text-muted small text-uppercase">Datos de Entrega</h6>
+        <p class="mb-1 fw-semibold">{{ order.customer_name }}</p>
+        <p class="mb-1 text-muted small">{{ order.shipping_address }}</p>
+        <p class="mb-1 text-muted small">{{ order.shipping_city }}, {{ order.shipping_country }}</p>
+        <p class="mb-0 text-muted small"><i class="bi bi-telephone me-1"></i>{{ order.customer_phone }} | <i class="bi bi-envelope me-1"></i>{{ order.customer_email }}</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <h6 class="fw-bold text-muted small text-uppercase">Resumen Financiero</h6>
+        <p class="mb-1 small">Subtotal: <strong>${{ order.subtotal }}</strong></p>
+        <p class="mb-1 small">Despacho: <strong>${{ order.shipping_cost }}</strong></p>
+        <p class="mb-1 small">IVA: <strong>${{ order.tax_amount }}</strong></p>
+        <p class="h5 fw-bold text-dark mt-2">Total: ${{ order.total_amount }}</p>
+      </div>
+    </div>
+
+    <h6 class="fw-bold mb-3">Artículos del Pedido</h6>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light small">
+          <tr>
+            <th>Producto</th>
+            <th class="text-center">Precio</th>
+            <th class="text-center">Cantidad</th>
+            <th class="text-end">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>
+                <span class="fw-semibold">{{ item.product_name }}</span>
+              </td>
+              <td class="text-center">${{ item.unit_price }}</td>
+              <td class="text-center">{{ item.quantity }}</td>
+              <td class="text-end fw-bold">${{ item.line_total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}

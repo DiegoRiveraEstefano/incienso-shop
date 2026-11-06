@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% translate "Error Interno del Servidor (500)" %} | Incienso Shop
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <article class="card border-0 shadow-sm text-center p-4">
+          <div class="card-body">
+            <span class="badge text-bg-danger mb-2">HTTP 500</span>
+            <h1 class="h3 fw-bold mb-3">{% translate "Error Interno del Servidor" %}</h1>
+            <p class="text-body-secondary mb-4">
+              {% translate "Ha ocurrido un error inesperado al procesar la solicitud. El evento ha sido registrado en el analizador de logs." %}
+            </p>
+            <a href="{% url 'home' %}" class="btn btn-primary">{% translate "Reintentar desde el Inicio" %}</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+{% endblock content %}

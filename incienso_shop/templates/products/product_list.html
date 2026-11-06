@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Catálogo de Inciensos Artesanales - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">Catálogo de Inciensos y Sahumerios</h1>
+      <p class="text-muted small mb-0">Selecciona fragancias puras, resinas naturales y formatos tradicionales.</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+    <form method="get" class="row g-2 align-items-end" up-target="#product-grid" up-autosubmit>
+      <div class="col-md-4 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">Buscar por Nombre</label>
+        {% render_field filter.form.name class+="form-control form-control-sm" placeholder="Ej: Copal, Sándalo..." %}
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">Categoría</label>
+        {% render_field filter.form.category class+="form-select form-select-sm" %}
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">Familia Olfativa</label>
+        {% render_field filter.form.aroma_family class+="form-select form-select-sm" %}
+      </div>
+      <div class="col-md-2 col-sm-6 d-flex gap-2">
+        <button type="submit" class="btn btn-warning btn-sm w-100 fw-semibold">
+          <i class="bi bi-funnel me-1"></i> Filtrar
+        </button>
+        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary btn-sm" up-follow>Limpiar</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Products Grid container targeted by Unpoly -->
+  <div id="product-grid">
+    <div class="row g-4">
+      {% for product in products %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card hover-lift">
+            <div class="position-relative bg-light text-center py-4 px-2" style="min-height: 180px;">
+              {% if product.primary_image_url %}
+                <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="img-fluid" style="max-height: 150px; object-fit: contain;">
+              {% else %}
+                <i class="bi bi-fire display-3 text-warning opacity-50"></i>
+              {% endif %}
+
+              <span class="position-absolute top-0 start-0 m-2">
+                <incienso-aroma-badge family="{{ product.aroma_family }}"></incienso-aroma-badge>
+              </span>
+
+              {% if product.discount_pct > 0 %}
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">-{{ product.discount_pct }}%</span>
+              {% endif %}
+            </div>
+
+            <div class="card-body d-flex flex-column p-3">
+              <span class="text-muted small mb-1">{{ product.category.name }}</span>
+              <h5 class="card-title fw-bold fs-6 mb-1">
+                <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark stretched-link" up-follow>
+                  {{ product.name }}
+                </a>
+              </h5>
+              <p class="text-muted small mb-2 text-truncate">{{ product.description|default:"Incienso puro artesanal" }}</p>
+
+              <div class="d-flex align-items-baseline gap-2 mt-auto mb-3">
+                <span class="fs-5 fw-bold text-dark">${{ product.price }}</span>
+                {% if product.compare_at_price %}
+                  <span class="text-muted text-decoration-line-through small">${{ product.compare_at_price }}</span>
+                {% endif %}
+              </div>
+
+              <!-- Quick Add to Cart Button (Unpoly enabled) -->
+              <form action="{% url 'orders:cart_add' product.id %}" method="post" class="position-relative z-2" up-submit up-target="#header-cart-badge">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn btn-outline-warning w-100 btn-sm fw-semibold d-flex justify-content-center align-items-center">
+                  <i class="bi bi-cart-plus me-1"></i> Agregar al Carrito
+                </button>
+              </form>
+            </div>
+          </article>
+        </div>
+      {% empty %}
+        <div class="col-12 py-5 text-center">
+          <i class="bi bi-search display-3 text-muted mb-3 d-block"></i>
+          <h4>No encontramos inciensos con esos filtros</h4>
+          <p class="text-muted">Intenta cambiar los términos de búsqueda o limpiar las opciones seleccionadas.</p>
+          <a href="{% url 'products:product_list' %}" class="btn btn-warning" up-follow>Ver todos los inciensos</a>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <nav class="mt-5 d-flex justify-content-center" aria-label="Paginación de productos">
+        <ul class="pagination pagination-sm">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}" up-target="#product-grid">Anterior</a>
+            </li>
+          {% endif %}
+          <li class="page-item disabled">
+            <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+          </li>
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}" up-target="#product-grid">Siguiente</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}

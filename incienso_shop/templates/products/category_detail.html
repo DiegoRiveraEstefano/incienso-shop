@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'home' %}" up-follow>Inicio</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}" up-follow>Catálogo</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="p-4 p-md-5 mb-4 rounded-4 text-white bg-dark shadow-sm">
+    <div class="col-md-8 px-0">
+      <h1 class="display-5 fw-bold">{{ category.name }}</h1>
+      <p class="lead my-3 text-light-50">{{ category.description|default:"Selección curada de resinas e inciensos artesanales." }}</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    {% for product in products %}
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card hover-lift">
+          <div class="card-body d-flex flex-column p-3">
+            <h5 class="card-title fw-bold fs-6 mb-1">
+              <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark" up-follow>
+                {{ product.name }}
+              </a>
+            </h5>
+            <span class="fs-5 fw-bold text-dark mt-auto mb-2">${{ product.price }}</span>
+            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-warning btn-sm fw-semibold" up-follow>Ver Detalle</a>
+          </div>
+        </article>
+      </div>
+    {% empty %}
+      <div class="col-12 py-5 text-center text-muted">
+        No hay productos activos en esta categoría por el momento.
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

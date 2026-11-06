@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Carrito de Compras - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 fw-bold mb-4"><i class="bi bi-bag-heart me-2 text-warning"></i>Tu Carrito de Inciensos</h1>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+        {% if cart.items.all %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead class="text-muted small">
+                <tr>
+                  <th scope="col">Incienso</th>
+                  <th scope="col" class="text-center">Precio</th>
+                  <th scope="col" class="text-center">Cantidad</th>
+                  <th scope="col" class="text-end">Total</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in cart.items.all %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="bi bi-fire fs-3 text-warning me-3"></i>
+                        <div>
+                          <a href="{{ item.product.get_absolute_url }}" class="fw-bold text-decoration-none text-dark" up-follow>
+                            {{ item.product.name }}
+                          </a>
+                          <span class="d-block small text-muted">{{ item.product.get_aroma_family_display }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-center">${{ item.product.price }}</td>
+                    <td class="text-center fw-bold">{{ item.quantity }}</td>
+                    <td class="text-end fw-bold">${{ item.line_total }}</td>
+                    <td class="text-end">
+                      <form action="{% url 'orders:cart_remove' item.product.id %}" method="post" up-submit up-target="#main-content">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Eliminar">
+                          <i class="bi bi-trash fs-5"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="py-5 text-center text-muted">
+            <i class="bi bi-cart-x display-3 text-warning opacity-50 mb-3 d-block"></i>
+            <h5>Tu carrito está vacío</h5>
+            <p class="small">Aún no has seleccionado inciensos o resinas naturales.</p>
+            <a href="{% url 'products:product_list' %}" class="btn btn-warning btn-sm mt-2" up-follow>Explorar el Catálogo</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Summary Box -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <h5 class="fw-bold mb-3">Resumen del Pedido</h5>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Subtotal</span>
+          <span class="fw-semibold">${{ cart.subtotal }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Despacho</span>
+          <span>
+            {% if cart.subtotal >= settings.free_shipping_threshold %}
+              <span class="text-success fw-bold">Gratis</span>
+            {% else %}
+              ${{ settings.standard_shipping_cost }}
+            {% endif %}
+          </span>
+        </div>
+
+        {% if cart.subtotal < settings.free_shipping_threshold %}
+          <div class="alert alert-warning py-1 px-2 small mb-3">
+            Agrega productos por más de ${{ settings.free_shipping_threshold }} para obtener despacho gratuito.
+          </div>
+        {% endif %}
+
+        <hr>
+
+        <div class="d-flex justify-content-between mb-4">
+          <span class="h6 fw-bold mb-0">Total Estimado</span>
+          <span class="h5 fw-bold text-dark mb-0">${{ cart.subtotal }}</span>
+        </div>
+
+        {% if cart.items.all %}
+          <a href="{% url 'orders:checkout' %}" class="btn btn-warning w-100 fw-bold py-2 shadow-sm" up-follow>
+            Iniciar Checkout <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        {% endif %}
+
+        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary btn-sm w-100 mt-2" up-follow>
+          Continuar Comprando
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

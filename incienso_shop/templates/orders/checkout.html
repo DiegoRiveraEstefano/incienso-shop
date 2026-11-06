@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Checkout - Finalizar Compra{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-5">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <h4 class="fw-bold mb-3"><i class="bi bi-truck me-2 text-warning"></i>Datos de Envío y Contacto</h4>
+        <p class="text-muted small mb-4">Ingresa la dirección donde deseas recibir tus inciensos artesanales.</p>
+
+        {% crispy form %}
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <h5 class="fw-bold mb-3">Tu Pedido</h5>
+        <ul class="list-group list-group-flush mb-3 small">
+          {% for item in cart.items.all %}
+            <li class="list-group-item d-flex justify-content-between lh-sm px-0">
+              <div>
+                <h6 class="my-0 fw-semibold">{{ item.product.name }}</h6>
+                <small class="text-muted">{{ item.quantity }}x ${{ item.product.price }}</small>
+              </div>
+              <span class="text-muted fw-bold">${{ item.line_total }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Subtotal</span>
+          <span>${{ cart.subtotal }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Despacho</span>
+          <span>
+            {% if cart.subtotal >= settings.free_shipping_threshold %}
+              <span class="text-success fw-bold">Gratis</span>
+            {% else %}
+              ${{ settings.standard_shipping_cost }}
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3 small">
+          <span class="text-muted">IVA ({{ settings.tax_rate_pct }}%)</span>
+          <span>Calculado en confirmación</span>
+        </div>
+
+        <div class="alert alert-light border small text-muted">
+          <i class="bi bi-lock-fill text-success me-1"></i> Transacción protegida. En el siguiente paso podrás seleccionar tu método de pago con <strong>django-payments</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

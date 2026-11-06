@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ store_settings.store_name }} - Configuración{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">{{ store_settings.store_name }}</h4>
+      <a href="{% url 'core:settings_update' store_settings.pk %}" class="btn btn-primary btn-sm" up-follow>
+        <i class="bi bi-pencil"></i> Editar
+      </a>
+    </div>
+    <div class="card-body">
+      <dl class="row mb-0">
+        <dt class="col-sm-4">Eslogan</dt>
+        <dd class="col-sm-8">{{ store_settings.tagline }}</dd>
+
+        <dt class="col-sm-4">Email</dt>
+        <dd class="col-sm-8">{{ store_settings.contact_email }}</dd>
+
+        <dt class="col-sm-4">Teléfono</dt>
+        <dd class="col-sm-8">{{ store_settings.contact_phone }}</dd>
+
+        <dt class="col-sm-4">Moneda</dt>
+        <dd class="col-sm-8"><span class="badge bg-secondary">{{ store_settings.currency }}</span></dd>
+
+        <dt class="col-sm-4">Monto Mínimo Envío Gratis</dt>
+        <dd class="col-sm-8">${{ store_settings.free_shipping_threshold }}</dd>
+
+        <dt class="col-sm-4">Costo Envío Estándar</dt>
+        <dd class="col-sm-8">${{ store_settings.standard_shipping_cost }}</dd>
+
+        <dt class="col-sm-4">IVA</dt>
+        <dd class="col-sm-8">{{ store_settings.tax_rate_pct }}%</dd>
+
+        <dt class="col-sm-4">Modo Mantenimiento</dt>
+        <dd class="col-sm-8">
+          {% if store_settings.maintenance_mode %}
+            <span class="badge bg-danger">Activo</span>
+          {% else %}
+            <span class="badge bg-success">Inactivo</span>
+          {% endif %}
+        </dd>
+      </dl>
+    </div>
+  </div>
+</div>
+{% endblock content %}

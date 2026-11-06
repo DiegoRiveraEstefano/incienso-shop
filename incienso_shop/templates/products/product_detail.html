@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'home' %}" up-follow>Inicio</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}" up-follow>Catálogo</a></li>
+      <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}" up-follow>{{ product.category.name }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-5 mb-5">
+    <!-- Visual / Image -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+        {% if product.primary_image_url %}
+          <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="img-fluid rounded-3" style="max-height: 400px; object-fit: contain;">
+        {% else %}
+          <div class="py-5">
+            <i class="bi bi-fire display-1 text-warning opacity-75"></i>
+            <p class="text-muted mt-2">Imagen ilustrativa artesanal</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Product Info & Purchasing -->
+    <div class="col-lg-6">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <incienso-aroma-badge family="{{ product.aroma_family }}"></incienso-aroma-badge>
+        <span class="badge bg-light text-dark border">{{ product.get_product_format_display }}</span>
+      </div>
+
+      <h1 class="h2 fw-bold mb-2">{{ product.name }}</h1>
+      <p class="text-muted small mb-3">SKU: <span class="fw-semibold">{{ product.sku }}</span> | Origen: {{ product.origin_country }}</p>
+
+      <div class="d-flex align-items-baseline gap-3 mb-4">
+        <span class="display-6 fw-bold text-dark">${{ product.price }}</span>
+        {% if product.compare_at_price %}
+          <span class="fs-5 text-muted text-decoration-line-through">${{ product.compare_at_price }}</span>
+          <span class="badge bg-danger">-{{ product.discount_pct }}% Descuento</span>
+        {% endif %}
+      </div>
+
+      <div class="p-3 bg-light rounded-3 mb-4 border">
+        <div class="row text-center g-2 small">
+          <div class="col-4 border-end">
+            <i class="bi bi-clock-history text-warning fs-5 d-block mb-1"></i>
+            <span class="text-muted d-block">Duración</span>
+            <strong>{{ product.burn_time_minutes }} min</strong>
+          </div>
+          <div class="col-4 border-end">
+            <i class="bi bi-box2 text-warning fs-5 d-block mb-1"></i>
+            <span class="text-muted d-block">Contenido</span>
+            <strong>{{ product.pieces_count }} varillas</strong>
+          </div>
+          <div class="col-4">
+            <i class="bi bi-check-circle text-success fs-5 d-block mb-1"></i>
+            <span class="text-muted d-block">Estado</span>
+            <incienso-stock-counter stock="{{ product.stock }}"></incienso-stock-counter>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-secondary mb-4">{{ product.description }}</p>
+
+      <!-- Add to Cart Form -->
+      <form action="{% url 'orders:cart_add' product.id %}" method="post" class="card p-3 border-0 shadow-sm rounded-4 mb-4" up-submit up-target="#header-cart-badge">
+        {% csrf_token %}
+        <div class="row g-2 align-items-center">
+          <div class="col-4">
+            <label class="form-label small text-muted mb-1">Cantidad</label>
+            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control text-center fw-bold">
+          </div>
+          <div class="col-8">
+            <label class="form-label d-none d-md-block small text-muted mb-1">&nbsp;</label>
+            <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm" {% if not product.in_stock %}disabled{% endif %}>
+              <i class="bi bi-bag-plus me-1"></i> Agregar al Carrito
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <section class="mt-5 border-top pt-5" aria-labelledby="reviews-heading">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <h3 id="reviews-heading" class="h4 fw-bold mb-3">Reseñas y Experiencias</h3>
+        <p class="text-muted small">Lee lo que otros practicantes de meditación y aromaterapia opinan sobre este incienso.</p>
+
+        {% if request.user.is_authenticated %}
+          <div class="card p-3 border-0 shadow-sm rounded-4">
+            <h6 class="fw-bold mb-3">Deja tu Calificación</h6>
+            <form action="{% url 'reviews:add_review' product.slug %}" method="post">
+              {% csrf_token %}
+              <div class="mb-2">
+                <label class="form-label small">Puntuación</label>
+                <select name="rating" class="form-select form-select-sm">
+                  <option value="5">⭐⭐⭐⭐⭐ (Excelente)</option>
+                  <option value="4">⭐⭐⭐⭐ (Muy Bueno)</option>
+                  <option value="3">⭐⭐⭐ (Bueno)</option>
+                  <option value="2">⭐⭐ (Regular)</option>
+                  <option value="1">⭐ (Malo)</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label small">Título breve</label>
+                <input type="text" name="title" class="form-control form-control-sm" placeholder="Ej: Aroma envolvente y dulce" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small">Tu comentario</label>
+                <textarea name="comment" rows="3" class="form-control form-control-sm" placeholder="Describe cómo se sintió la fragancia..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm w-100">Publicar Reseña</button>
+            </form>
+          </div>
+        {% else %}
+          <div class="alert alert-light border small">
+            <a href="{% url 'account_login' %}" up-follow>Inicia sesión</a> para dejar una opinión sobre este producto.
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-7">
+        <div class="d-flex flex-column gap-3">
+          {% for review in product.reviews.all %}
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-warning small">
+                  {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                  {% endfor %}
+                </span>
+                <span class="text-muted small">{{ review.created_at|date:"d M, Y" }}</span>
+              </div>
+              <h6 class="fw-bold mb-1">{{ review.title }}</h6>
+              <p class="text-muted small mb-1">{{ review.comment }}</p>
+              <span class="small text-secondary"><i class="bi bi-person me-1"></i>{{ review.user.username }}</span>
+            </div>
+          {% empty %}
+            <div class="p-4 text-center text-muted bg-white rounded-4 border">
+              <i class="bi bi-chat-heart display-5 mb-2 d-block text-warning opacity-50"></i>
+              Aún no hay reseñas para este incienso. ¡Sé el primero en compartir tu experiencia!
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %}

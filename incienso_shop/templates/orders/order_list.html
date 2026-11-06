@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load django_tables2 %}
+
+{% block title %}Mis Pedidos - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-0">Mis Pedidos</h1>
+      <p class="text-muted small mb-0">Historial de compras y estado de envíos.</p>
+    </div>
+    <a href="{% url 'products:product_list' %}" class="btn btn-warning btn-sm fw-semibold" up-follow>
+      <i class="bi bi-bag-plus me-1"></i> Nueva Compra
+    </a>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+    {% render_table table %}
+  </div>
+</div>
+{% endblock content %}

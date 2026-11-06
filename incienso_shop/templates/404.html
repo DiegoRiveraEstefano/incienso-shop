@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% translate "Página No Encontrada (404)" %} | Incienso Shop
+{% endblock title %}
+{% block content %}
+  <main id="main-content" class="py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <article class="card border-0 shadow-sm text-center p-4">
+          <div class="card-body">
+            <span class="badge text-bg-warning mb-2">HTTP 404</span>
+            <h1 class="h3 fw-bold mb-3">{% translate "Página No Encontrada" %}</h1>
+            <p class="text-body-secondary mb-4">
+              {% if exception %}
+                {{ exception }}
+              {% else %}
+                {% translate "El recurso o registro que buscas no existe o fue movido." %}
+              {% endif %}
+            </p>
+            <a href="{% url 'home' %}" class="btn btn-primary">{% translate "Volver al Panel Principal" %}</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+{% endblock content %}

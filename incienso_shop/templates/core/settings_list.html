@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load django_tables2 crispy_forms_tags %}
+
+{% block title %}Configuración de la Tienda - Incienso Shop{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-0 text-gray-800">Parámetros de la Tienda</h1>
+      <p class="text-muted small mb-0">Gestión de moneda, costos de despacho y modo mantenimiento.</p>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      {% render_table table %}
+    </div>
+  </div>
+</div>
+{% endblock content %}
